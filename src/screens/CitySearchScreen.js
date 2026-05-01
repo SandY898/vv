@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import WeatherDisplay from "../components/WeatherDisplay";
 import { API_KEY } from "../utils/weatherHelpers";
+import DynamicBackground from "../components/DynamicBackground";
 
 export default function CitySearchScreen() {
   const [city, setCity] = useState("");
@@ -42,44 +43,54 @@ export default function CitySearchScreen() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      {/* Блок поиска */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Введите название города..."
-          value={city}
-          onChangeText={setCity}
-          onSubmitEditing={fetchWeatherByCity}
-        />
-        <TouchableOpacity style={styles.button} onPress={fetchWeatherByCity}>
-          <Text style={styles.buttonText}>Поиск</Text>
-        </TouchableOpacity>
-      </View>
+  const condition = weather?.weather[0]?.main || "Clear";
 
-      {/* Тот самый переиспользуемый компонент! */}
-      <WeatherDisplay weather={weather} loading={loading} error={error} />
-    </View>
+  return (
+    // 3. Оборачиваем ВЕСЬ экран, включая поиск, в наш градиент
+    <DynamicBackground condition={condition}>
+      <View style={styles.container}>
+        {/* Этот блок автоматически сдвинется вниз благодаря paddingTop: 110 в DynamicBackground */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Введите город..."
+            value={city}
+            onChangeText={setCity}
+            onSubmitEditing={fetchWeatherByCity}
+            placeholderTextColor="#888" // Делаем плейсхолдер читаемым
+          />
+          <TouchableOpacity style={styles.button} onPress={fetchWeatherByCity}>
+            <Text style={styles.buttonText}>Поиск</Text>
+          </TouchableOpacity>
+        </View>
+
+        <WeatherDisplay weather={weather} loading={loading} error={error} />
+      </View>
+    </DynamicBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1 },
   searchContainer: {
     flexDirection: "row",
-    padding: 15,
-    backgroundColor: "#f1f1f1",
+    paddingHorizontal: 20, // Немного улучшили отступы
+    paddingBottom: 15, // чтобы гармонировало с фоном
+    backgroundColor: "transparent", // Убрали лишние рамки
   },
   input: {
     flex: 1,
-    height: 45,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    height: 50,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 12,
     paddingHorizontal: 15,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    fontFamily: "Montserrat-Regular",
+    elevation: 5, // Тень для Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4, // Тень для iOS
   },
   button: {
     marginLeft: 10,

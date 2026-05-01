@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import * as Location from "expo-location";
 import WeatherDisplay from "../components/WeatherDisplay";
 import { API_KEY } from "../utils/weatherHelpers";
+import DynamicBackground from "../components/DynamicBackground";
 
 export default function CurrentLocationScreen() {
   const [weather, setWeather] = useState(null);
@@ -43,13 +44,18 @@ export default function CurrentLocationScreen() {
     })();
   }, []);
 
+  const condition = weather?.weather[0]?.main || "Clear";
+
   return (
-    <View style={styles.container}>
-      <WeatherDisplay weather={weather} loading={loading} error={error} />
-    </View>
+    // 3. Оборачиваем весь экран в фон
+    <DynamicBackground condition={condition}>
+      <View style={styles.container}>
+        <WeatherDisplay weather={weather} loading={loading} error={error} />
+      </View>
+    </DynamicBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1},
 });
